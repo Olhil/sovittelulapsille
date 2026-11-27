@@ -44,4 +44,13 @@ No build tools, package managers (`npm`), or backend runtimes are required.
 
 1. Clone or download this repository:
    ```bash
-   git clone [https://github.com/Olhil/sovittelulapsille.git](https://github.com/Olhil/sovittelulapsille.git)
+   git clone https://github.com/Olhil/sovittelulapsille.git
+   ```
+2. Open `index.html` directly in any modern browser, or serve the folder via any static web server (GitHub Pages, Cloudflare Pages, or a local school/library intranet).
+
+---
+
+## Contributing & Privacy
+
+* See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on translations, accessibility testing, and our strict **human-authored code policy**.
+* See [PRIVACY.md](PRIVACY.md) for full details on our zero-data, zero-tracking architecture.
