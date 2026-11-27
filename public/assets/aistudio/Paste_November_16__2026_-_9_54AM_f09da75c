@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#4F46E5" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Tunnetutka — Sovittelupeli (7–10 v.)</title>
+  <style>
+    :root {
+      --bg: #F0F4F8;
+      --surface: #FFFFFF;
+      --primary: #4F46E5;
+      --primary-light: #EEF2FF;
+      --secondary: #10B981;
+      --danger: #EF4444;
+      --warning: #F59E0B;
+      --text: #1E293B;
+      --muted: #64748B;
+      --radius: 24px;
+      --shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    #app {
+      width: 100%;
+      max-width: 600px;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      gap: 16px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--surface);
+      padding: 12px 18px;
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .logo {
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-counter {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    h1, h2, h3 { margin: 0; text-align: center; }
+    h1 { font-size: 1.6rem; }
+    h2 { font-size: 1.3rem; }
+    p { margin: 0; text-align: center; color: var(--muted); font-size: 1.05rem; line-height: 1.4; }
+
+    .btn-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 18px;
+      padding: 16px 20px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.12s ease, background 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-align: center;
+    }
+
+    .btn:active { transform: scale(0.96); }
+    .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 6px 0 #3730A3; }
+    .btn-secondary { background: var(--secondary); color: #fff; box-shadow: 0 6px 0 #047857; }
+    .btn-warning { background: var(--warning); color: #fff; box-shadow: 0 6px 0 #B45309; }
+    .btn-danger { background: var(--danger); color: #fff; box-shadow: 0 6px 0 #B91C1C; }
+    .btn-ghost { background: #E2E8F0; color: var(--text); }
+    .btn-outline { background: #fff; border: 3px solid #E2E8F0; color: var(--text); }
+    .btn-outline.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+
+    /* Arena / Stage */
+    .stage {
+      background: linear-gradient(180deg, #E0E7FF 0%, #F8FAFC 100%);
+      border-radius: 20px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      min-height: 210px;
+      position: relative;
+      border: 2px solid #C7D2FE;
+    }
+
+    .character-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      width: 45%;
+    }
+
+    .char-name {
+      font-weight: 800;
+      font-size: 1rem;
+      background: #fff;
+      padding: 4px 12px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .speech-bubble {
+      background: #fff;
+      border: 2px solid #CBD5E1;
+      border-radius: 16px;
+      padding: 10px 14px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .speech-bubble.angry {
+      border-color: var(--danger);
+      background: #FEF2F2;
+      color: #991B1B;
+    }
+
+    .speech-bubble.calm {
+      border-color: var(--secondary);
+      background: #ECFDF5;
+      color: #065F46;
+    }
+
+    /* Spiky Fog / Armor effect */
+    .armor-ring {
+      position: absolute;
+      top: 32px;
+      width: 125px;
+      height: 125px;
+      border-radius: 50%;
+      border: 5px dashed var(--danger);
+      animation: spin 12s linear infinite;
+      pointer-events: none;
+      transition: all 0.4s ease;
+    }
+
+    .armor-ring.broken {
+      opacity: 0;
+      transform: scale(1.4);
+    }
+
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    .shake {
+      animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    /* Emotion Grid */
+    .emotions-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .emo-btn {
+      background: #F8FAFC;
+      border: 3px solid #E2E8F0;
+      border-radius: 16px;
+      padding: 10px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .emo-btn span.emoji { font-size: 2rem; }
+    .emo-btn span.label { font-size: 0.85rem; font-weight: 700; color: var(--text); }
+    .emo-btn.active { border-color: var(--primary); background: var(--primary-light); transform: scale(1.04); }
+
+    /* Phrase Builder */
+    .phrase-slot {
+      background: #F1F5F9;
+      border: 2px dashed #94A3B8;
+      border-radius: 16px;
+      padding: 14px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--primary);
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .phrase-slot.filled {
+      background: #EEF2FF;
+      border-style: solid;
+      border-color: var(--primary);
+    }
+
+    .blocks-pool {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .chip {
+      background: #fff;
+      border: 2px solid #CBD5E1;
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      box-shadow: 0 3px 0 #CBD5E1;
+    }
+
+    .chip:active { transform: translateY(2px); box-shadow: none; }
+    .chip.question-chip { border-color: var(--secondary); color: #065F46; background: #ECFDF5; box-shadow: 0 3px 0 #6EE7B7; }
+    .chip.toxic-chip { border-color: #FCA5A5; color: #991B1B; background: #FEF2F2; box-shadow: 0 3px 0 #FCA5A5; }
+
+    /* Avatar selector */
+    .avatar-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .avatar-opt {
+      border: 3px solid #E2E8F0;
+      border-radius: 16px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      background: #fff;
+    }
+
+    .avatar-opt.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    /* Confetti canvas */
+    #confetti {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 99;
+    }
+
+    .hint-box {
+      background: #FEF3C7;
+      color: #92400E;
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .stickers-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .sticker-card {
+      border: 2px solid #E2E8F0;
+      border-radius: 16px;
+      padding: 12px;
+      text-align: center;
+      background: #F8FAFC;
+    }
+
+    .sticker-card.unlocked {
+      border-color: var(--warning);
+      background: #FFFBEB;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+  <div id="app">
+    <header>
+      <div class="logo" onclick="goHome()" style="cursor:pointer;">🔍 Tunnetutka</div>
+      <div class="badge-counter" onclick="openAlbum()">🏆 Tarrat: <span id="sticker-count">0</span>/5</div>
+    </header>
+    <main id="screen" class="card"></main>
+  </div>
+
+  <script>
+    // --- PWA Manifest Injection (Single-File) ---
+    const manifestData = {
+      name: "Tunnetutka — Sovittelupeli",
+      short_name: "Tunnetutka",
+      start_url: ".",
+      display: "standalone",
+      background_color: "#F0F4F8",
+      theme_color: "#4F46E5",
+      icons: [{
+        src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%234F46E5'/><text x='50' y='68' font-size='55' text-anchor='middle'>🦊</text></svg>",
+        sizes: "192x192",
+        type: "image/svg+xml"
+      }]
+    };
+    const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+    const manifestLink = document.createElement('link');
+    manifestLink.rel = 'manifest';
+    manifestLink.href = URL.createObjectURL(manifestBlob);
+    document.head.appendChild(manifestLink);
+
+    // --- Web Audio API Sound Effects ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playTone(type) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      const now = audioCtx.currentTime;
+      if (type === 'tap') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(520, now);
+        osc.frequency.exponentialRampToValueAtTime(680, now + 0.08);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+        osc.start(now);
+        osc.stop(now + 0.08);
+      } else if (type === 'error') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(160, now);
+        osc.frequency.linearRampToValueAtTime(110, now + 0.25);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
+        if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
+      } else if (type === 'success') {
+        [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = 'triangle';
+          o.frequency.setValueAtTime(freq, now + i * 0.09);
+          g.gain.setValueAtTime(0.18, now + i * 0.09);
+          g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.09 + 0.35);
+          o.connect(g);
+          g.connect(audioCtx.destination);
+          o.start(now + i * 0.09);
+          o.stop(now + i * 0.09 + 0.35);
+        });
+        if (navigator.vibrate) navigator.vibrate(120);
+      }
+    }
+
+    // --- Game Data (Finnish, 7-10 y.o. school context) ---
+    const CHARACTERS = [
+      { id: 'fox', name: 'Kettu Vilkku', color: '#F97316', ears: 'fox' },
+      { id: 'bear', name: 'Karhu Otso', color: '#8B5CF6', ears: 'bear' },
+      { id: 'bunny', name: 'Pupu Loikka', color: '#EC4899', ears: 'bunny' },
+      { id: 'cat', name: 'Kissa Mirri', color: '#0EA5E9', ears: 'cat' }
+    ];
+
+    const EMOTIONS = [
+      { id: 'anger', label: 'Viha', emoji: '😠', brows: 'angry', mouth: 'frown' },
+      { id: 'hurt', label: 'Harmitus', emoji: '🥺', brows: 'sad', mouth: 'pout' },
+      { id: 'fear', label: 'Pelko', emoji: '😨', brows: 'raised', mouth: 'open' },
+      { id: 'sad', label: 'Suru', emoji: '😢', brows: 'sad', mouth: 'sad' },
+      { id: 'shame', label: 'Häpeä', emoji: '😳', brows: 'sad', mouth: 'wavy' },
+      { id: 'calm', label: 'Ilo', emoji: '😊', brows: 'normal', mouth: 'smile' }
+    ];
+
+    const SCENARIOS = [
+      {
+        id: 'tower',
+        title: 'Kaatunut torni',
+        sticker: '🏰 Tornimestari',
+        situation: 'Hahmo B juoksi pallon perässä ja törmäsi vahingossa Hahmo A:n korkeaan torniin. Palikat levisivät lattialle!',
+        maskShout: '«Sinä rikoit sen tahallasi! Mene pois!»',
+        trueEmotion: 'hurt',
+        observationChip: 'Näen, että torni kaatui.',
+        toxicChip: 'Oma vikasi, mitäs rakensit keskelle lattiaa!',
+        needOptions: [
+          'rakensin sitä kauan ja näin paljon vaivaa',
+          'halusin syödä jäätelöä',
+          'ulkona alkoi sataa vettä'
+        ],
+        correctNeed: 0
+      },
+      {
+        id: 'game',
+        title: 'Ei päässyt peliin',
+        sticker: '⚽ Ystävyyden kapteeni',
+        situation: 'Välitunnilla jaetaan joukkueita peliin, ja Hahmo A:lle sanotaan: «Paikat ovat jo täynnä.»',
+        maskShout: '«Ihan sama! Teidän peli on muutenkin tylsä!»',
+        trueEmotion: 'sad',
+        observationChip: 'Jäit seisomaan pelin ulkopuolelle.',
+        toxicChip: 'Älä valita, leiki yksin!',
+        needOptions: [
+          'halusin kovasti pelata yhdessä muiden kanssa',
+          'kengännauhani aukesi',
+          'unohdin penaalin kotiin'
+        ],
+        correctNeed: 0
+      },
+      {
+        id: 'notebook',
+        title: 'Vesitahra piirustuksessa',
+        sticker: '🎨 Piirustusten suojelija',
+        situation: 'Hahmo B halusi näyttää hauskaa kuvaa ja kaatoi vahingossa vettä suoraan Hahmo A:n piirustuksen päälle.',
+        maskShout: '«Katso eteesi! Pilasit kaiken!»',
+        trueEmotion: 'anger',
+        observationChip: 'Piirustukseesi tuli märkä tahra.',
+        toxicChip: 'Sehän on vain paperi, piirrä uusi!',
+        needOptions: [
+          'tämä piirustus oli minulle todella tärkeä',
+          'pidän vihreistä omenoista',
+          'kohta soi välituntikello'
+        ],
+        correctNeed: 0
+      },
+      {
+        id: 'secret',
+        title: 'Salaisuus paljastui',
+        sticker: '🤫 Salaisuuksien vartija',
+        situation: 'Hahmo A kertoi luottamuksella, mitä hän jännittää, mutta Hahmo B lipsautti asian muille luokassa.',
+        maskShout: '«En puhu sinulle enää koskaan!»',
+        trueEmotion: 'shame',
+        observationChip: 'Muut saivat tietää asian, joka oli salaisuus.',
+        toxicChip: 'Älä viitsi, kaikki ovat unohtaneet sen jo!',
+        needOptions: [
+          'minulle on tärkeää luottaa ystävään eikä nolostua muiden edessä',
+          'haluan ajaa polkupyörällä',
+          'tänään on tiistai'
+        ],
+        correctNeed: 0
+      },
+      {
+        id: 'ball',
+        title: 'Kiista pallosta',
+        sticker: '🤝 Sovun mestari',
+        situation: 'Molemmat hahmot tarttuivat samaan aikaan liikuntasalin ainoaan vapaaseen palloon.',
+        maskShout: '«Päästä irti! Minä koskin siihen ensin!»',
+        trueEmotion: 'fear',
+        observationChip: 'Pidämme molemmat kiinni samasta pallosta.',
+        toxicChip: 'Anna tänne, minä olen nopeampi!',
+        needOptions: [
+          'pelkäsin, etten ehdi pelata välitunnilla ollenkaan',
+          'pallo on pyöreä ja sininen',
+          'ruokalassa on tänään keittoa'
+        ],
+        correctNeed: 0
+      }
+    ];
+
+    // --- State ---
+    let state = {
+      screen: 'home', // home | select_chars | story | mirilka | album
+      mode: 'story',
+      charA: CHARACTERS[0],
+      charB: CHARACTERS[1],
+      scenarioIndex: 0,
+      step: 1, // 1: detect emotion, 2: ask question, 3: answer emotion+need, 4: victory
+      selectedEmotionA: 'anger',
+      selectedEmotionB: 'fear',
+      builtObs: false,
+      builtQuestion: false,
+      chosenAnswerEmo: null,
+      chosenNeed: null,
+      unlockedStickers: JSON.parse(localStorage.getItem('emo_stickers_fi') || '[]'),
+      // Mirilka (2 players live conflict) state
+      mirilkaStep: 1,
+      p1Emo: null,
+      p2Emo: null
+    };
+
+    function saveSticker(id) {
+      if (!state.unlockedStickers.includes(id)) {
+        state.unlockedStickers.push(id);
+        localStorage.setItem('emo_stickers_fi', JSON.stringify(state.unlockedStickers));
+      }
+      updateHeader();
+    }
+
+    function updateHeader() {
+      document.getElementById('sticker-count').textContent = state.unlockedStickers.length;
+    }
+
+    // --- Dynamic SVG Character Generator ---
+    function renderAvatarSVG(char, emotionId = 'calm', size = 110) {
+      const emo = EMOTIONS.find(e => e.id === emotionId) || EMOTIONS[5];
+      let earsSVG = '';
+      if (char.ears === 'fox') {
+        earsSVG = `<polygon points="20,38 12,8 42,26" fill="${char.color}"/><polygon points="80,38 88,8 58,26" fill="${char.color}"/>`;
+      } else if (char.ears === 'bear') {
+        earsSVG = `<circle cx="22" cy="22" r="14" fill="${char.color}"/><circle cx="78" cy="22" r="14" fill="${char.color}"/>`;
+      } else if (char.ears === 'bunny') {
+        earsSVG = `<ellipse cx="32" cy="18" rx="9" ry="22" fill="${char.color}"/><ellipse cx="68" cy="18" rx="9" ry="22" fill="${char.color}"/>`;
+      } else {
+        earsSVG = `<polygon points="18,40 16,10 44,25" fill="${char.color}"/><polygon points="82,40 84,10 56,25" fill="${char.color}"/>`;
+      }
+
+      let browsSVG = '';
+      if (emo.brows === 'angry') {
+        browsSVG = `<line x1="28" y1="42" x2="44" y2="48" stroke="#1E293B" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="72" y1="42" x2="56" y2="48" stroke="#1E293B" stroke-width="4" stroke-linecap="round"/>`;
+      } else if (emo.brows === 'sad') {
+        browsSVG = `<line x1="28" y1="48" x2="44" y2="42" stroke="#1E293B" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="72" y1="48" x2="56" y2="42" stroke="#1E293B" stroke-width="4" stroke-linecap="round"/>`;
+      } else if (emo.brows === 'raised') {
+        browsSVG = `<path d="M28,42 Q36,35 44,42" fill="none" stroke="#1E293B" stroke-width="3.5" stroke-linecap="round"/>
+                    <path d="M56,42 Q64,35 72,42" fill="none" stroke="#1E293B" stroke-width="3.5" stroke-linecap="round"/>`;
+      } else {
+        browsSVG = `<path d="M30,43 Q36,40 42,43" fill="none" stroke="#1E293B" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M58,43 Q64,40 70,43" fill="none" stroke="#1E293B" stroke-width="3" stroke-linecap="round"/>`;
+      }
+
+      let mouthSVG = '';
+      if (emo.mouth === 'smile') {
+        mouthSVG = `<path d="M36,68 Q50,82 64,68" fill="none" stroke="#1E293B" stroke-width="4" stroke-linecap="round"/>`;
+      } else if (emo.mouth === 'frown') {
+        mouthSVG = `<path d="M36,76 Q50,62 64,76" fill="none" stroke="#1E293B" stroke-width="4" stroke-linecap="round"/>`;
+      } else if (emo.mouth === 'pout') {
+        mouthSVG = `<path d="M40,74 Q50,67 60,74" fill="none" stroke="#1E293B" stroke-width="4" stroke-linecap="round"/>
+                    <circle cx="26" cy="64" r="4" fill="#38BDF8" opacity="0.8"/>`;
+      } else if (emo.mouth === 'open') {
+        mouthSVG = `<ellipse cx="50" cy="72" rx="8" ry="10" fill="#1E293B"/>`;
+      } else if (emo.mouth === 'wavy') {
+        mouthSVG = `<path d="M36,72 Q43,67 50,72 T64,72" fill="none" stroke="#1E293B" stroke-width="4" stroke-linecap="round"/>
+                    <circle cx="28" cy="60" r="6" fill="#FDA4AF" opacity="0.7"/>
+                    <circle cx="72" cy="60" r="6" fill="#FDA4AF" opacity="0.7"/>`;
+      } else {
+        mouthSVG = `<path d="M38,75 Q50,65 62,75" fill="none" stroke="#1E293B" stroke-width="4" stroke-linecap="round"/>
+                    <circle cx="74" cy="62" r="4" fill="#38BDF8"/>`;
+      }
+
+      return `
+        <svg width="${size}" height="${size}" viewBox="0 0 100 100">
+          ${earsSVG}
+          <circle cx="50" cy="55" r="38" fill="${char.color}" />
+          <ellipse cx="50" cy="63" rx="26" ry="22" fill="#FFFBEB" opacity="0.9"/>
+          <circle cx="36" cy="53" r="5" fill="#1E293B"/>
+          <circle cx="64" cy="53" r="5" fill="#1E293B"/>
+          <circle cx="38" cy="51" r="1.8" fill="#FFF"/>
+          <circle cx="66" cy="51" r="1.8" fill="#FFF"/>
+          <ellipse cx="50" cy="61" rx="5" ry="3.5" fill="#1E293B"/>
+          ${browsSVG}
+          ${mouthSVG}
+        </svg>
+      `;
+    }
+
+    // --- Navigation & Screens ---
+    function goHome() {
+      playTone('tap');
+      state.screen = 'home';
+      render();
+    }
+
+    function openAlbum() {
+      playTone('tap');
+      state.screen = 'album';
+      render();
+    }
+
+    function startSetup(mode) {
+      playTone('tap');
+      state.mode = mode;
+      state.screen = 'select_chars';
+      render();
+    }
+
+    function selectChar(slot, id) {
+      playTone('tap');
+      const found = CHARACTERS.find(c => c.id === id);
+      if (slot === 'A') state.charA = found;
+      else state.charB = found;
+      render();
+    }
+
+    function launchMode() {
+      playTone('tap');
+      if (state.mode === 'story') {
+        state.screen = 'story';
+        startScenario(state.scenarioIndex);
+      } else {
+        state.screen = 'mirilka';
+        state.mirilkaStep = 1;
+        state.p1Emo = null;
+        state.p2Emo = null;
+        render();
+      }
+    }
+
+    function startScenario(idx) {
+      state.scenarioIndex = idx % SCENARIOS.length;
+      state.step = 1;
+      state.selectedEmotionA = 'anger';
+      state.selectedEmotionB = 'fear';
+      state.builtObs = false;
+      state.builtQuestion = false;
+      state.chosenAnswerEmo = null;
+      state.chosenNeed = null;
+      render();
+    }
+
+    // --- Story Gameplay Actions ---
+    function pickDetectorEmotion(emoId) {
+      playTone('tap');
+      state.selectedEmotionA = emoId;
+      render();
+    }
+
+    function checkDetectorEmotion() {
+      const sc = SCENARIOS[state.scenarioIndex];
+      if (state.selectedEmotionA === sc.trueEmotion) {
+        playTone('success');
+        state.step = 2;
+        render();
+      } else {
+        playTone('error');
+        const box = document.getElementById('charA-box');
+        if (box) {
+          box.classList.remove('shake');
+          void box.offsetWidth;
+          box.classList.add('shake');
+        }
+        const hint = document.getElementById('step1-hint');
+        if (hint) {
+          hint.textContent = 'Ei aivan! Huuto on vain suojakuori. Katso silmiä: mikä tunne piileskelee sisällä?';
+        }
+      }
+    }
+
+    function tapChip(type) {
+      if (type === 'toxic') {
+        playTone('error');
+        const stage = document.getElementById('stage-box');
+        if (stage) {
+          stage.classList.remove('shake');
+          void stage.offsetWidth;
+          stage.classList.add('shake');
+        }
+        const hint = document.getElementById('step2-hint');
+        if (hint) {
+          hint.textContent = 'Hups! Syyttely sulkee hahmon panssariin. Kysy sen sijaan tunteista!';
+        }
+        return;
+      }
+      playTone('tap');
+      if (type === 'obs') state.builtObs = true;
+      if (type === 'question') state.builtQuestion = true;
+
+      if (state.builtObs && state.builtQuestion) {
+        playTone('success');
+        setTimeout(() => {
+          state.step = 3;
+          render();
+        }, 650);
+      }
+      render();
+    }
+
+    function selectAnswerEmo(emoId) {
+      playTone('tap');
+      state.chosenAnswerEmo = emoId;
+      render();
+    }
+
+    function selectAnswerNeed(idx) {
+      const sc = SCENARIOS[state.scenarioIndex];
+      if (idx === sc.correctNeed) {
+        state.chosenNeed = idx;
+        playTone('success');
+        saveSticker(sc.id);
+        state.step = 4;
+        fireConfetti();
+        render();
+      } else {
+        playTone('error');
+        const hint = document.getElementById('step3-hint');
+        if (hint) hint.textContent = 'Mieti tarkkaan, miksi tässä tilanteessa tuli paha mieli?';
+      }
+    }
+
+    // --- Render Functions ---
+    function render() {
+      updateHeader();
+      const screen = document.getElementById('screen');
+
+      if (state.screen === 'home') {
+        screen.innerHTML = `
+          <div style="display:flex; flex-direction:column; align-items:center; gap:14px; margin-top:10px;">
+            <div style="display:flex; gap:12px;">
+              ${renderAvatarSVG(CHARACTERS[0], 'calm', 95)}
+              ${renderAvatarSVG(CHARACTERS[1], 'calm', 95)}
+            </div>
+            <h1>Auta hahmoja sopimaan!</h1>
+            <p>Selvitä, mikä tunne piileskelee huudon takana, kysy taikakysymys <b>«Miltä sinusta tuntuu?»</b> ja pura riidan piikikäs suojakuori.</p>
+          </div>
+          <div class="btn-grid">
+            <button class="btn btn-primary" onclick="startSetup('story')">
+              🎮 Tarinapulmat (1 pelaaja)
+            </button>
+            <button class="btn btn-secondary" onclick="startSetup('mirilka')">
+              🤝 Sovintokone kahdelle (Oikea riita)
+            </button>
+            <button class="btn btn-ghost" onclick="openAlbum()">
+              🏆 Tarra-albumini (${state.unlockedStickers.length}/5)
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      if (state.screen === 'select_chars') {
+        screen.innerHTML = `
+          <h2>Valitse kaksi hahmoa</h2>
+          <p>${state.mode === 'story' ? 'Ketkä seikkailevat tarinassa tänään?' : 'Kumpikin valitsee oman hahmonsa!'}</p>
+          <div>
+            <div style="font-weight:700; margin-bottom:6px; color:var(--primary);">Hahmo 1: ${state.charA.name}</div>
+            <div class="avatar-grid">
+              ${CHARACTERS.map(c => `
+                <div class="avatar-opt ${state.charA.id === c.id ? 'selected' : ''}" onclick="selectChar('A', '${c.id}')">
+                  ${renderAvatarSVG(c, 'calm', 60)}
+                  <span style="font-size:0.75rem; font-weight:700;">${c.name.split(' ')[0]}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          <div>
+            <div style="font-weight:700; margin-bottom:6px; color:var(--secondary);">Hahmo 2: ${state.charB.name}</div>
+            <div class="avatar-grid">
+              ${CHARACTERS.map(c => `
+                <div class="avatar-opt ${state.charB.id === c.id ? 'selected' : ''}" onclick="selectChar('B', '${c.id}')">
+                  ${renderAvatarSVG(c, 'calm', 60)}
+                  <span style="font-size:0.75rem; font-weight:700;">${c.name.split(' ')[0]}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          <div class="btn-grid" style="grid-template-columns: 1fr 2fr;">
+            <button class="btn btn-ghost" onclick="goHome()">← Takaisin</button>
+            <button class="btn btn-primary" onclick="launchMode()">Aloita! 🚀</button>
+          </div>
+        `;
+        return;
+      }
+
+      if (state.screen === 'story') {
+        const sc = SCENARIOS[state.scenarioIndex];
+        const isVictory = state.step === 4;
+        const charAEmo = isVictory ? 'calm' : state.selectedEmotionA;
+        const charBEmo = isVictory ? 'calm' : (state.step === 3 && state.chosenAnswerEmo ? state.chosenAnswerEmo : 'fear');
+
+        let controlsHTML = '';
+
+        if (state.step === 1) {
+          controlsHTML = `
+            <div class="hint-box" id="step1-hint">
+              🔍 <b>Vaihe 1:</b> Paina tunteita säätääksesi Tunnetutkaa. Mikä on hahmon ${state.charA.name} oikea tunne?
+            </div>
+            <div class="emotions-grid">
+              ${EMOTIONS.filter(e => e.id !== 'calm').map(e => `
+                <div class="emo-btn ${state.selectedEmotionA === e.id ? 'active' : ''}" onclick="pickDetectorEmotion('${e.id}')">
+                  <span class="emoji">${e.emoji}</span>
+                  <span class="label">${e.label}</span>
+                </div>
+              `).join('')}
+            </div>
+            <button class="btn btn-primary" onclick="checkDetectorEmotion()">Tarkista tunne ✨</button>
+          `;
+        } else if (state.step === 2) {
+          const phraseText = [
+            state.builtObs ? sc.observationChip : '[Havainto]',
+            state.builtQuestion ? 'Miltä sinusta tuntuu nyt?' : '[Taikakysymys]'
+          ].join(' ');
+
+          controlsHTML = `
+            <div class="hint-box" id="step2-hint">
+              🗝️ <b>Vaihe 2:</b> Kokoa hahmolle ${state.charB.name} avainlause, joka poistaa piikikkään suojakuoren!
+            </div>
+            <div class="phrase-slot ${state.builtObs || state.builtQuestion ? 'filled' : ''}">
+              ${phraseText}
+            </div>
+            <div class="blocks-pool">
+              ${!state.builtObs ? `<div class="chip" onclick="tapChip('obs')">👀 ${sc.observationChip}</div>` : ''}
+              ${!state.builtQuestion ? `<div class="chip question-chip" onclick="tapChip('question')">💬 Miltä sinusta tuntuu nyt?</div>` : ''}
+              <div class="chip toxic-chip" onclick="tapChip('toxic')">⚡ ${sc.toxicChip}</div>
+            </div>
+          `;
+        } else if (state.step === 3) {
+          controlsHTML = `
+            <div class="hint-box" id="step3-hint">
+              💛 <b>Vaihe 3:</b> Auta hahmoa ${state.charA.name} vastaamaan kysymykseen rehellisesti!
+            </div>
+            <div style="font-weight:700; text-align:center;">1. Nimeä tunteesi:</div>
+            <div class="emotions-grid">
+              ${EMOTIONS.filter(e => e.id !== 'calm').map(e => `
+                <div class="emo-btn ${state.chosenAnswerEmo === e.id ? 'active' : ''}" onclick="selectAnswerEmo('${e.id}')">
+                  <span class="emoji">${e.emoji}</span>
+                  <span class="label">${e.label}</span>
+                </div>
+              `).join('')}
+            </div>
+            ${state.chosenAnswerEmo ? `
+              <div style="font-weight:700; text-align:center; margin-top:4px;">2. Jatka lausetta: «Minusta tuntuu tältä, koska...»</div>
+              <div class="btn-grid">
+                ${sc.needOptions.map((opt, idx) => `
+                  <button class="btn btn-outline" style="padding:12px; font-size:0.95rem;" onclick="selectAnswerNeed(${idx})">
+                    «...${opt}»
+                  </button>
+                `).join('')}
+              </div>
+            ` : ''}
+          `;
+        } else if (state.step === 4) {
+          controlsHTML = `
+            <div style="text-align:center; background:#ECFDF5; border:2px solid #10B981; border-radius:18px; padding:14px;">
+              <h2 style="color:#065F46;">🎉 Suojakuori katosi! Hahmot sopivat!</h2>
+              <p style="color:#047857; margin-top:6px;">Sait tarran: <b>${sc.sticker}</b></p>
+            </div>
+            <div class="btn-grid" style="grid-template-columns: 1fr 1fr;">
+              <button class="btn btn-ghost" onclick="goHome()">Valikkoon</button>
+              <button class="btn btn-secondary" onclick="startScenario(${state.scenarioIndex + 1})">Seuraava ➔</button>
+            </div>
+          `;
+        }
+
+        screen.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-weight:800; color:var(--primary);">Tarina ${state.scenarioIndex + 1}/${SCENARIOS.length}: ${sc.title}</span>
+            <button class="chip" style="padding:6px 10px;" onclick="goHome()">✕</button>
+          </div>
+          <p style="font-size:0.95rem; background:#F8FAFC; padding:10px; border-radius:14px;">${sc.situation}</p>
+
+          <div class="stage" id="stage-box">
+            <div class="character-box" id="charA-box">
+              <div class="armor-ring ${state.step >= 3 ? 'broken' : ''}"></div>
+              ${renderAvatarSVG(state.charA, charAEmo, 100)}
+              <div class="char-name">${state.charA.name}</div>
+              <div class="speech-bubble ${isVictory ? 'calm' : 'angry'}">
+                ${isVictory ? '«Kiitos kun kysyit! Sovitaan vaan!»' : sc.maskShout}
+              </div>
+            </div>
+
+            <div class="character-box">
+              ${renderAvatarSVG(state.charB, charBEmo, 100)}
+              <div class="char-name">${state.charB.name}</div>
+              <div class="speech-bubble ${state.step >= 3 ? 'calm' : ''}">
+                ${state.step === 1 ? '«Miksi hän huutaa noin?..»' : state.step === 2 ? '«Mitä minun pitäisi sanoa?»' : '«Miltä sinusta tuntuu nyt?»'}
+              </div>
+            </div>
+          </div>
+
+          ${controlsHTML}
+        `;
+        return;
+      }
+
+      if (state.screen === 'mirilka') {
+        let bodyHTML = '';
+        if (state.mirilkaStep === 1) {
+          bodyHTML = `
+            <div class="hint-box">📱 Ojentakaa laite pelaajalle <b>${state.charA.name}</b></div>
+            <h2>${state.charB.name} kysyy ääneen:</h2>
+            <div class="phrase-slot filled" style="font-size:1.25rem;">«Miltä sinusta tuntuu nyt?»</div>
+            <p>${state.charA.name}, valitse tunteesi ja sano ääneen: <b>«Minusta tuntuu...»</b></p>
+            <div class="emotions-grid">
+              ${EMOTIONS.filter(e => e.id !== 'calm').map(e => `
+                <div class="emo-btn ${state.p1Emo === e.id ? 'active' : ''}" onclick="state.p1Emo='${e.id}'; playTone('tap'); render();">
+                  <span class="emoji">${e.emoji}</span>
+                  <span class="label">${e.label}</span>
+                </div>
+              `).join('')}
+            </div>
+            ${state.p1Emo ? `<button class="btn btn-primary" onclick="state.mirilkaStep=2; playTone('tap'); render();">Sanoin ääneen! Anna vuoro toiselle ➔</button>` : ''}
+          `;
+        } else if (state.mirilkaStep === 2) {
+          bodyHTML = `
+            <div class="hint-box">📱 Nyt laite on pelaajalla <b>${state.charB.name}</b></div>
+            <h2>${state.charA.name} kysyy ääneen:</h2>
+            <div class="phrase-slot filled" style="font-size:1.25rem;">«Miltä sinusta tuntuu nyt?»</div>
+            <p>${state.charB.name}, valitse tunteesi ja sano ääneen: <b>«Minusta tuntuu...»</b></p>
+            <div class="emotions-grid">
+              ${EMOTIONS.filter(e => e.id !== 'calm').map(e => `
+                <div class="emo-btn ${state.p2Emo === e.id ? 'active' : ''}" onclick="state.p2Emo='${e.id}'; playTone('tap'); render();">
+                  <span class="emoji">${e.emoji}</span>
+                  <span class="label">${e.label}</span>
+                </div>
+              `).join('')}
+            </div>
+            ${state.p2Emo ? `<button class="btn btn-secondary" onclick="state.mirilkaStep=3; playTone('success'); fireConfetti(); render();">Kuuntelimme toisiamme! 🤝</button>` : ''}
+          `;
+        } else {
+          const e1 = EMOTIONS.find(e => e.id === state.p1Emo);
+          const e2 = EMOTIONS.find(e => e.id === state.p2Emo);
+          bodyHTML = `
+            <div class="stage">
+              <div class="character-box">
+                ${renderAvatarSVG(state.charA, 'calm', 95)}
+                <div class="char-name">${state.charA.name}</div>
+                <div class="speech-bubble calm">Tunne oli: ${e1.emoji} ${e1.label}</div>
+              </div>
+              <div class="character-box">
+                ${renderAvatarSVG(state.charB, 'calm', 95)}
+                <div class="char-name">${state.charB.name}</div>
+                <div class="speech-bubble calm">Tunne oli: ${e2.emoji} ${e2.label}</div>
+              </div>
+            </div>
+            <h2>Sopikaa yhdessä, miten jatkatte, ja heittäkää ylävitoset! ✋</h2>
+            <button class="btn btn-primary" onclick="goHome()">Sopimus syntyi! Valikkoon 🎉</button>
+          `;
+        }
+
+        screen.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-weight:800; color:var(--secondary);">🤝 Sovintokone kahdelle</span>
+            <button class="chip" style="padding:6px 10px;" onclick="goHome()">✕</button>
+          </div>
+          ${bodyHTML}
+        `;
+        return;
+      }
+
+      if (state.screen === 'album') {
+        screen.innerHTML = `
+          <h2>🏆 Tarra-albumi</h2>
+          <p>Ratkaise tarinapulmat ja kerää kaikki 5 merkkiä!</p>
+          <div class="stickers-grid">
+            ${SCENARIOS.map((sc, idx) => {
+              const unlocked = state.unlockedStickers.includes(sc.id);
+              return `
+                <div class="sticker-card ${unlocked ? 'unlocked' : ''}" onclick="startSetup('story'); state.scenarioIndex=${idx};">
+                  <div style="font-size:2.2rem;">${unlocked ? sc.sticker.split(' ')[0] : '🔒'}</div>
+                  <div style="font-weight:700; font-size:0.85rem; margin-top:6px;">
+                    ${unlocked ? sc.sticker.substring(2) : sc.title}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+          <button class="btn btn-primary" onclick="goHome()">Takaisin peliin</button>
+        `;
+      }
+    }
+
+    // --- Confetti Celebration ---
+    function fireConfetti() {
+      const canvas = document.getElementById('confetti');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const pieces = Array.from({ length: 70 }, () => ({
+        x: Math.random() * canvas.width,
+        y: -20 - Math.random() * 100,
+        r: 6 + Math.random() * 6,
+        c: ['#4F46E5', '#10B981', '#F59E0B', '#EC4899', '#0EA5E9'][Math.floor(Math.random() * 5)],
+        vy: 3 + Math.random() * 5,
+        vx: -2 + Math.random() * 4
+      }));
+      let frame = 0;
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          ctx.fillStyle = p.c;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        if (++frame < 90) requestAnimationFrame(draw);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      draw();
+    }
+
+    // Init
+    render();
+  </script>
+</body>
+</html>
+
+
